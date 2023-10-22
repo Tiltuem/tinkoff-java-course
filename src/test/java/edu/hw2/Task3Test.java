@@ -5,11 +5,11 @@ import edu.hw2.Task3.connectionManagers.impl.DefaultConnectionManager;
 import edu.hw2.Task3.connectionManagers.impl.FaultyConnectionManager;
 import edu.hw2.Task3.connections.Connection;
 import edu.hw2.Task3.connections.impl.FaultyConnection;
-import java.util.HashSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import java.util.HashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Task3Test {
