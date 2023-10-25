@@ -5,31 +5,16 @@ import edu.project1.dictionary.DictionaryImpl;
 import edu.project1.guessResult.GuessResult;
 import edu.project1.guessResult.GuessResultImpl;
 import edu.project1.guessResult.StagesOfHangman;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class HangmanGameImpl implements HangmanGame {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MISTAKES_MAX = 6;
-    private static final int ZERO_MISTAKES = 0;
-    private static final int ONE_MISTAKES = 1;
-    private static final int TWO_MISTAKES = 2;
-    private static final int THREE_MISTAKES = 3;
-    private static final int FOUR_MISTAKES = 4;
-    private static final int FIVE_MISTAKES = 5;
-    private static final int SIX_MISTAKES = 6;
-    private static final HashMap<Integer, StagesOfHangman> STAGES = new HashMap<>() {{
-        put(ZERO_MISTAKES, StagesOfHangman.ZERO);
-        put(ONE_MISTAKES, StagesOfHangman.ONE);
-        put(TWO_MISTAKES, StagesOfHangman.TWO);
-        put(THREE_MISTAKES, StagesOfHangman.THREE);
-        put(FOUR_MISTAKES, StagesOfHangman.FOUR);
-        put(FIVE_MISTAKES, StagesOfHangman.FIVE);
-        put(SIX_MISTAKES, StagesOfHangman.SIX);
-    }};
+    private final Scanner inputLatter = new Scanner(System.in);
 
     private final Dictionary dictionary;
     private final GuessResult guessResult;
@@ -38,9 +23,7 @@ public class HangmanGameImpl implements HangmanGame {
     private StringBuilder maskedWord;
     private int mistakesCounter;
     private HashSet<Character> enteredLetters;
-    private boolean isGameOver;
     private boolean isPlayerWin;
-    private final Scanner inputLatter = new Scanner(System.in);
 
     public HangmanGameImpl() {
         this.dictionary = new DictionaryImpl();
@@ -52,7 +35,6 @@ public class HangmanGameImpl implements HangmanGame {
         setSecretWord(dictionary.randomWord());
         setMaskedWord(new StringBuilder("_".repeat(secretWord.length())));
         setMistakesCounter(0);
-        setGameOver(false);
     }
 
     @Override
@@ -61,19 +43,19 @@ public class HangmanGameImpl implements HangmanGame {
 
         enteredLetters = new HashSet<>();
 
-
         LOGGER.info("Начало игры.\nДля того чтобы сдаться, введите -1\nСлово - " + maskedWord);
-        LOGGER.info(STAGES.get(0).toString());
+        LOGGER.info(StagesOfHangman.values()[0].toString());
 
-        while (!isGameOver) {
+        while (true) {
             String guess = askLetter();
 
             if (guess.equals("-1")) {
+                isPlayerWin = false;
                 giveUp();
-                isGameOver = true;
+                break;
             }
 
-            if (!isGameOver && validate(guess)) {
+            if (validate(guess)) {
                 enteredLetters.add(guess.charAt(0));
                 int indexLatter = secretWord.indexOf(guess);
 
@@ -85,20 +67,19 @@ public class HangmanGameImpl implements HangmanGame {
                         }
                     }
 
-                    guessResult.successfulGuess(maskedWord.toString(), STAGES.get(mistakesCounter));
+                    guessResult.successfulGuess(maskedWord.toString(), StagesOfHangman.values()[mistakesCounter]);
                 } else {
                     mistakesCounter++;
-                    guessResult.failedGuess(maskedWord.toString(), STAGES.get(mistakesCounter));
+                    guessResult.failedGuess(maskedWord.toString(), StagesOfHangman.values()[mistakesCounter]);
                 }
             }
 
             if (isOver()) {
-                isGameOver = true;
                 endGame();
+                break;
             }
         }
     }
-
 
     @Override
     public void giveUp() {
@@ -107,24 +88,24 @@ public class HangmanGameImpl implements HangmanGame {
 
     @Override
     public void endGame() {
-        if (mistakesCounter == MISTAKES_MAX) {
-            isPlayerWin = false;
-            guessResult.defeat(secretWord);
-        } else {
-            isPlayerWin = true;
+        isPlayerWin = mistakesCounter != MISTAKES_MAX;
+
+        if (isPlayerWin) {
             guessResult.won();
+        } else {
+            guessResult.defeat(secretWord);
         }
     }
 
     @Override
-    public String askLetter() {
+    public @NotNull String askLetter() {
         LOGGER.info("Введите букву: ");
         return inputLatter.next().toLowerCase();
     }
 
     @Override
-    public Boolean validate(String enter) {
-        if (!enter.matches("[а-яА-Я]{1}")) {
+    public @NotNull Boolean validate(String enter) {
+        if (!enter.matches("[а-яА-Я]")) {
             LOGGER.info("Некорректный ввод.");
 
             return false;
@@ -138,7 +119,7 @@ public class HangmanGameImpl implements HangmanGame {
     }
 
     @Override
-    public Boolean isOver() {
+    public @NotNull Boolean isOver() {
         return mistakesCounter == MISTAKES_MAX || secretWord.contentEquals(maskedWord);
     }
 
@@ -172,14 +153,6 @@ public class HangmanGameImpl implements HangmanGame {
 
     public void setEnteredLetters(HashSet<Character> enteredLetters) {
         this.enteredLetters = enteredLetters;
-    }
-
-    public boolean isGameOver() {
-        return isGameOver;
-    }
-
-    public void setGameOver(boolean gameOver) {
-        isGameOver = gameOver;
     }
 
     public boolean isPlayerWin() {

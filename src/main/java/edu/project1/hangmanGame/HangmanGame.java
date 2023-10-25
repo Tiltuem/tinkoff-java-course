@@ -1,15 +1,17 @@
 package edu.project1.hangmanGame;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface HangmanGame {
     void initGame();
 
     void playGame();
 
-    String askLetter();
+    @NotNull String askLetter();
 
-    Boolean validate(String enter);
+    @NotNull Boolean validate(String enter);
 
-    Boolean isOver();
+    @NotNull Boolean isOver();
 
     void giveUp();
 

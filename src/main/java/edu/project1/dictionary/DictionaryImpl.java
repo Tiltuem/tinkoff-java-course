@@ -8,21 +8,23 @@ import java.util.Random;
 import org.jetbrains.annotations.NotNull;
 
 public class DictionaryImpl implements Dictionary {
-    @Override
-    public @NotNull String randomWord() {
-        Random random = new Random();
-        List<String> words;
+    private static final Random RANDOM = new Random();
+    private final List<String> words;
 
+    public DictionaryImpl() {
         try {
             words = Files.readAllLines(Paths.get("src/main/resources/words.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public @NotNull String randomWord() {
         if (words.isEmpty()) {
             throw new RuntimeException("Нет слов в файле");
         }
 
-        return words.get(random.nextInt(words.size()));
+        return words.get(RANDOM.nextInt(words.size()));
     }
 }
