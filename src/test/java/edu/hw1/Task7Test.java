@@ -1,4 +1,4 @@
-package edu;
+package edu.hw1;
 
 import edu.hw1.Task7;
 import org.junit.jupiter.api.DisplayName;

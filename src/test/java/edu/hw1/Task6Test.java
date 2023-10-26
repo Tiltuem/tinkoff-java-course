@@ -1,4 +1,4 @@
-package edu;
+package edu.hw1;
 
 import edu.hw1.Task4;
 import edu.hw1.Task5;
