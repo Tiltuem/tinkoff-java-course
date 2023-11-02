@@ -28,18 +28,17 @@ public class Task5 {
             }
         }
 
-        Collections.sort(contactList);
-
         return order(contactList, order);
     }
 
     private static List<Contact> order(List<Contact> contactList, String order) {
         switch (order) {
             case "ASC" -> {
+                Collections.sort(contactList);
                 return contactList;
             }
             case "DESC" -> {
-                Collections.reverse(contactList);
+                contactList.sort(Collections.reverseOrder());
                 return contactList;
             }
             default -> throw new IllegalArgumentException("Incorrect order");
