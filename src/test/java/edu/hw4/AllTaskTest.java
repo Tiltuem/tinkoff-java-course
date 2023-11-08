@@ -28,7 +28,7 @@ public class AllTaskTest {
     static Arguments[] animals() {
         List<Animal> animals = new ArrayList<>() {
             {
-                add(new Animal("Шарик", Animal.Type.DOG, Animal.Sex.M, 12, 40, 20, false));
+                add(new Animal("Шарик", Animal.Type.DOG, Animal.Sex.M, 12, 40, 20, true));
                 add(new Animal("Бобик", Animal.Type.DOG, Animal.Sex.F, 2, 140, 20, false));
                 add(new Animal("Борис", Animal.Type.CAT, Animal.Sex.M, 1, 20, 3, false));
                 add(new Animal("Леопольд", Animal.Type.CAT, Animal.Sex.M, 10, 35, 5, true));
@@ -36,7 +36,7 @@ public class AllTaskTest {
                 add(new Animal("Соловей", Animal.Type.BIRD, Animal.Sex.F, 2, 40, 20, false));
                 add(new Animal("Немо", Animal.Type.FISH, Animal.Sex.F, 1, 7, 10, true));
                 add(new Animal("Марлин", Animal.Type.FISH, Animal.Sex.M, 2, 9, 12, false));
-                add(new Animal("Добряк", Animal.Type.SPIDER, Animal.Sex.M, 7, 1, 1, false));
+                add(new Animal("Добряк", Animal.Type.SPIDER, Animal.Sex.M, 7, 1, 1, true));
                 add(new Animal("Человек паук", Animal.Type.SPIDER, Animal.Sex.M, 3, 2, 1, true));
             }
         };
@@ -190,7 +190,7 @@ public class AllTaskTest {
         // Животные, в записях о которых есть ошибки: вернуть имя и список ошибок
         assertEquals(AllTask.invalidValidate(animals), invalidValidate);
 
-        
+
         assertEquals(AllTask.prettyInvalidValidate(animals), prettyInvalidValidate);
     }
 }

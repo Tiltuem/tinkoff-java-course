@@ -3,6 +3,7 @@ package edu.hw4;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -112,10 +113,12 @@ public class AllTask {
     }
 
     public static Boolean isTrueSpidersBitesMoreDogs(List<Animal> animals) {
-        return animals.stream().anyMatch(o -> o.type() == Animal.Type.SPIDER)
-            && animals.stream().anyMatch(o -> o.type() == Animal.Type.DOG)
-            && animals.stream().filter(o -> o.type() == Animal.Type.SPIDER && o.bites()).count()
-            > animals.stream().filter(o -> o.type() == Animal.Type.DOG && o.bites()).count();
+        Map<Animal.Type, Long> bitesAnimals = animals.stream().filter(Animal::bites)
+            .collect(Collectors.groupingBy(Animal::type, Collectors.counting()));
+
+        return Objects.nonNull(bitesAnimals.get(Animal.Type.SPIDER))
+            && Objects.nonNull(bitesAnimals.get(Animal.Type.DOG))
+            && bitesAnimals.get(Animal.Type.SPIDER) > bitesAnimals.get(Animal.Type.DOG);
     }
 
     public static Animal maxWeightFish(List<List<Animal>> animalsList) {
