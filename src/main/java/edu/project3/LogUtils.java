@@ -26,6 +26,7 @@ public class LogUtils {
         DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
     private static final DateTimeFormatter FORMATTER_INFO =
         DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss Z", Locale.ENGLISH);
+    private static final String DATE_TO_OFFSET_DATE_TIME = ":00:00:00 +0000";
 
     private LogUtils() {
     }
@@ -41,12 +42,14 @@ public class LogUtils {
             try (Stream<String> lines = Files.lines(Paths.get(uri))) {
                 logRecords.addAll(lines.map(LogUtils::parseLogLine)
                     .filter(line -> fromArg == null
-                        || line.timestamp().isAfter(OffsetDateTime.parse(fromArg, FORMATTER_INFO)))
+                        || line.timestamp()
+                        .isAfter(OffsetDateTime.parse(fromArg + DATE_TO_OFFSET_DATE_TIME, FORMATTER_INFO)))
                     .filter(line -> toArg == null
-                        || line.timestamp().isBefore(OffsetDateTime.parse(toArg, FORMATTER_INFO)))
+                        || line.timestamp()
+                        .isBefore(OffsetDateTime.parse(toArg + DATE_TO_OFFSET_DATE_TIME, FORMATTER_INFO)))
                     .toList());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Invalid format log: " + e);
             }
         }
 
@@ -71,9 +74,10 @@ public class LogUtils {
 
             logRecords = bufferedReader.lines()
                 .map(LogUtils::parseLogLine)
-                .filter(line -> fromArg == null
-                    || line.timestamp().isAfter(OffsetDateTime.parse(fromArg, FORMATTER_INFO)))
-                .filter(line -> toArg == null || line.timestamp().isBefore(OffsetDateTime.parse(toArg, FORMATTER_INFO)))
+                .filter(line -> fromArg == null || line.timestamp().isAfter(
+                        OffsetDateTime.parse(fromArg + DATE_TO_OFFSET_DATE_TIME, FORMATTER_INFO)))
+                .filter(line -> toArg == null || line.timestamp().isBefore(
+                        OffsetDateTime.parse(toArg + DATE_TO_OFFSET_DATE_TIME, FORMATTER_INFO)))
                 .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);

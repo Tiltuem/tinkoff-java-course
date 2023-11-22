@@ -4,8 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static edu.project3.LogUtils.loadLogRecordsFile;
-import static edu.project3.LogUtils.loadLogRecordsHTTP;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import static edu.project3.LogWriter.writeAdocToFile;
 import static edu.project3.LogWriter.writeMarkdownToFile;
 
@@ -14,7 +17,7 @@ public class NginxLogAnalyzer {
     private static final String EXTENSION_LOG = ".log";
     private static final String INVALID_ARGUMENTS = "Invalid arguments";
     private static final ArrayList<String> FILES = new ArrayList<>();
-    private static List<LogRecord> logRecords = new ArrayList<>();
+    private static String path;
     private static String from;
     private static String to;
     private static String format;
@@ -25,8 +28,17 @@ public class NginxLogAnalyzer {
     @SuppressWarnings("UncommentedMain")
     public static void main(String[] args) {
         try {
-            if (!parseArgs(args)) {
-                logRecords = loadLogRecordsFile(FILES, from, to);
+            parseArgs(args);
+
+            List<LogRecord> logRecords;
+            if (path.endsWith("*")) {
+                checkDirectory();
+                logRecords = LogUtils.loadLogRecordsFile(FILES, from, to);
+            } else if (path.startsWith("http")) {
+                logRecords = LogUtils.loadLogRecordsHTTP(path, from, to);
+            } else {
+                FILES.add(path);
+                logRecords = LogUtils.loadLogRecordsFile(FILES, from, to);
             }
 
             LogReport report = new LogReport(logRecords, FILES, from, to);
@@ -41,60 +53,38 @@ public class NginxLogAnalyzer {
         }
     }
 
-    private static boolean parseArgs(String[] args) {
-        if (args[0].equals("--path")) {
-            int count = 1;
+    @SuppressWarnings("MultipleStringLiterals")
+    private static void parseArgs(String[] args) {
+        Options options = new Options();
+        options.addRequiredOption("path", "path", true, "Путь к NGINX лог-файлам (локальный шаблон или URL)");
+        options.addOption("from", true, "Временной параметр from ");
+        options.addOption("to", true, "Временной параметр to");
+        options.addOption("format", true, "Формат вывода результата (markdown или adoc)");
 
-            if (args[1].endsWith("*")) {
-                File directory = new File(args[1].substring(0, args[1].length() - 1));
-                File[] filesInDirectory =
-                    directory.listFiles((dir, name) -> name.endsWith(EXTENSION_TXT) || name.endsWith(EXTENSION_LOG));
+        CommandLineParser parser = new GnuParser();
+        try {
+            CommandLine cmd = parser.parse(options, args);
 
-                for (File file : filesInDirectory) {
-                    FILES.add(file.getName());
-                }
-
-            } else if (args.length > count && args[count].endsWith(EXTENSION_TXT)
-                || args[count].endsWith(EXTENSION_LOG)) {
-
-                while (args.length > count
-                    && (args[count].endsWith(EXTENSION_TXT)
-                    || args[count].endsWith(EXTENSION_LOG)
-                   )) {
-                    FILES.add(args[count]);
-                    count++;
-                }
-            }
-            count++;
-            while (args.length > count) {
-                switch (args[count]) {
-                    case "--from" -> {
-                        count++;
-                        from = args[count];
-                    }
-                    case "--to" -> {
-                        count++;
-                        to = args[count];
-                    }
-                    case "--format" -> {
-                        count++;
-                        format = args[count];
-                    }
-                    default -> {
-
-                    }
-                }
-                count++;
-            }
-
-            if (args[1].startsWith("http")) {
-                logRecords = loadLogRecordsHTTP(args[1], from, to);
-                return true;
-            }
-        } else {
+            path = cmd.getOptionValue("path");
+            from = cmd.getOptionValue("from");
+            to = cmd.getOptionValue("to");
+            format = cmd.getOptionValue("format");
+        } catch (ParseException e) {
             throw new IllegalArgumentException(INVALID_ARGUMENTS);
         }
+    }
 
-        return false;
+    private static void checkDirectory() {
+        File directory = new File(path.substring(0, path.length() - 1));
+        File[] filesInDirectory =
+            directory.listFiles((dir, name) -> name.endsWith(EXTENSION_TXT) || name.endsWith(EXTENSION_LOG));
+
+        if (Objects.isNull(filesInDirectory)) {
+            throw new IllegalArgumentException("No matching files");
+        }
+
+        for (File file : filesInDirectory) {
+            FILES.add(file.toString());
+        }
     }
 }

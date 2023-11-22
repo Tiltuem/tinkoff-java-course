@@ -27,8 +27,8 @@ public class LogReport {
         this.endDate = endDate;
     }
 
-    public List<String> getFiles() {
-        return files;
+    public String getFiles() {
+        return String.join(", ", files);
     }
 
     public String getStartDate() {
