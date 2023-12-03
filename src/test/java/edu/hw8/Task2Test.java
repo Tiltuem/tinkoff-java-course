@@ -39,4 +39,12 @@ public class Task2Test {
         }
     }
 
+    @Test
+    @DisplayName("exceptionTest")
+    void exceptionTest() {
+        assertThatThrownBy(() -> {
+            FibonacciCalc.calculate(-21312);
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Negative n");
+
+    }
 }
