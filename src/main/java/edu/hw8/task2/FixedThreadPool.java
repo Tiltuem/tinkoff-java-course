@@ -7,6 +7,7 @@ public class FixedThreadPool implements ThreadPool {
     private final int numThreads;
     private final Thread[] threads;
     private final BlockingQueue<Runnable> queue;
+    private static final int TIME_SLEEP = 100;
 
     public FixedThreadPool(int numThreads) {
         this.numThreads = numThreads;
@@ -44,6 +45,11 @@ public class FixedThreadPool implements ThreadPool {
     @Override
     public void close() {
         for (Thread thread : threads) {
+            try {
+                Thread.sleep(TIME_SLEEP);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             thread.interrupt();
         }
     }

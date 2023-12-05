@@ -1,42 +1,28 @@
 package edu.hw8;
 
 import edu.hw8.task2.FibonacciCalc;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Task2Test {
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-
-    @BeforeEach
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    public void restoreStreams() {
-        System.setOut(originalOut);
-    }
-
     @Test
-    @DisplayName("fibonacciCalc")
-    public void fibonacciCalc() {
-        int n = 5;
+    @DisplayName("fibonacciCalcTest")
+    public void fibonacciCalcTest() {
+        FibonacciCalc.calculate(10);
+        List<Long> expectedNum = List.of(0L, 1L, 1L, 2L, 3L, 5L, 8L, 13L, 21L, 34L);
 
-        FibonacciCalc.calculate(n);
-        String[] outputLines = outContent.toString().split("\\n");
-        assertThat(n).isEqualTo(outputLines.length);
+        List<Long> actualNum = FibonacciCalc.getFibonacciNumbers();
+        Collections.sort(actualNum);
+        Set<Long> actualThreads = FibonacciCalc.getThreadsId();
 
-        for (int i = 0; i < n; i++) {
-            assertTrue(outContent.toString().contains("Fibonacci(" + i + ")"));
-        }
+        assertThat(actualNum).isEqualTo(expectedNum);
+        assertThat(actualThreads.size()).isEqualTo(4);
     }
 
     @Test
@@ -45,6 +31,5 @@ public class Task2Test {
         assertThatThrownBy(() -> {
             FibonacciCalc.calculate(-21312);
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Negative n");
-
     }
 }

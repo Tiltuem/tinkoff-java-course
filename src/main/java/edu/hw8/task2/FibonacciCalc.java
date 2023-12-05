@@ -1,14 +1,27 @@
 package edu.hw8.task2;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FibonacciCalc {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final int THREADS = 8;
-    private static final int TIME = 2000;
+    private static final int THREADS = 4;
+    private static List<Long> fibonacciNumbers = new ArrayList<>();
+    private static HashSet<Long> threadsId = new HashSet<>();
 
-    private FibonacciCalc() {}
+    private FibonacciCalc() {
+    }
+
+    public static List<Long> getFibonacciNumbers() {
+        return fibonacciNumbers;
+    }
+
+    public static HashSet<Long> getThreadsId() {
+        return threadsId;
+    }
 
     public static void calculate(int n) {
         if (n < 0) {
@@ -22,14 +35,12 @@ public class FibonacciCalc {
                 final int currentN = i;
                 threadPool.execute(() -> {
                     long result = parallelFibonacci(currentN);
+                    fibonacciNumbers.add(result);
+                    threadsId.add(Thread.currentThread().getId());
                     LOGGER.info(
                         "Fibonacci(" + currentN + ") = " + result + " (Thread " + Thread.currentThread().getId() + ")");
                 });
             }
-
-            Thread.sleep(TIME);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -43,5 +54,10 @@ public class FibonacciCalc {
         FibonacciTask fibonacciTask = new FibonacciTask(n);
 
         return fibonacciTask.compute();
+    }
+
+    public void clear() {
+        fibonacciNumbers = new ArrayList<>();
+        threadsId = new HashSet<>();
     }
 }
