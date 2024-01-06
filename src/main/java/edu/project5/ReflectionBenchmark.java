@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
@@ -32,7 +33,7 @@ public class ReflectionBenchmark {
     private static Student student;
     private static Method method;
     private static MethodHandle methodHandle;
-    private static GetterInterface lambdaGetter;
+    private static Supplier<String> lambdaGetterSupplier;
 
     @SuppressWarnings({"checkstyle:uncommentedMain"})
     public static void main(String[] args) throws RunnerException {
@@ -65,15 +66,14 @@ public class ReflectionBenchmark {
 
         CallSite site = LambdaMetafactory.metafactory(
             caller,
-            "getName",
-            MethodType.methodType(GetterInterface.class),
+            "get",
+            MethodType.methodType(Supplier.class),
             getterMethodType,
             caller.findVirtual(Student.class, FIELD_NAME, MethodType.methodType(String.class)),
             getterMethodType
         );
 
-        lambdaGetter = (GetterInterface) (site.getTarget()).invokeExact();
-
+        lambdaGetterSupplier = (Supplier<String>) (site.getTarget()).invokeExact();
     }
 
     private MethodHandle getMethodHandle() throws Throwable {
@@ -122,7 +122,7 @@ public class ReflectionBenchmark {
 
     @Benchmark
     public void lambdaMetafactory(Blackhole blackhole) {
-        String name = lambdaGetter.getName(student);
+        String name = lambdaGetterSupplier.get();
         blackhole.consume(name);
     }
 }
