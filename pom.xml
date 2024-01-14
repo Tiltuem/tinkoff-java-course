@@ -28,7 +28,7 @@
         <java.release>21</java.release>
 
         <revision>1.0.0</revision>
-      
+
         <jetbrains-annotations.version>24.0.1</jetbrains-annotations.version>
         <log4j.version>2.20.0</log4j.version>
 
@@ -119,6 +119,7 @@
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>${jmh.version}</version>
             <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
