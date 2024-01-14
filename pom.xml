@@ -28,7 +28,7 @@
         <java.release>21</java.release>
 
         <revision>1.0.0</revision>
-
+      
         <jetbrains-annotations.version>24.0.1</jetbrains-annotations.version>
         <log4j.version>2.20.0</log4j.version>
 
@@ -46,6 +46,10 @@
         <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
 
         <jmh.version>1.37</jmh.version>
+
+        <bytebuddy.version>1.14.8</bytebuddy.version>
+        <asm.version>9.6</asm.version>
+
     </properties>
 
     <dependencyManagement>
@@ -115,6 +119,21 @@
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>${jmh.version}</version>
             <scope>provided</scope>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>${bytebuddy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${bytebuddy.version}</version>
         </dependency>
     </dependencies>
 
@@ -174,6 +193,11 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco-maven-plugin.version}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>edu/hw11/task2/**</exclude>
+                        </excludes>
+                    </configuration>
                     <executions>
                         <execution>
                             <goals>
